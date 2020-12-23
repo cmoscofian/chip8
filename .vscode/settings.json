@@ -1,6 +1,0 @@
-{
-	"C_Cpp.default.includePath": [
-		"headers"
-	],
-	"C_Cpp.default.cStandard": "c89"
-}
