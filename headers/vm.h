@@ -32,7 +32,7 @@ static const uint8_t VM_DEFAULT_SPRITES[VM_DEFAULT_SPRITES_SIZE] = {
 struct vm {
 	display_t display;
 	instructions_t instructions;
-	keypad_t keypad[KEYPAD_SIZE];
+	keypad_t keypad;
 	ram_t ram;
 	registers_t registers;
 	stacks_t stack;

@@ -1,4 +1,3 @@
-#include <memory.h>
 #include <stdlib.h>
 #include <time.h>
 #include "vm.h"
@@ -29,7 +28,7 @@ void VM_init(vm_t *vm, const char *filename, bool ETI, uint16_t y, uint16_t x) {
 
 	Display_init(&vm->display, y, x);
 	Instructions_init(&vm->instructions);
-	Keypad_init(vm->keypad, KEYPAD_DEFAULT_MAP);
+	Keypad_init(&vm->keypad, KEYPAD_DEFAULT_MAP);
 	RAM_init(&vm->ram);
 	Registers_init(&vm->registers);
 	Stack_init(&vm->stack);
@@ -299,18 +298,16 @@ void DRWVxVyNibble(vm_t *vm) {
 }
 
 void SKPVx(vm_t *vm) {
-	keypad_t *key = Keypad_get(vm->keypad, vm->registers.Vx[vm->instructions.x]);
-    if (key != NULL && key->state) {
+    if (Keypad_check(&vm->keypad, vm->registers.Vx[vm->instructions.x])) {
         vm->registers.PC += 2;
-		Keypad_keyoff(vm->keypad, key->key);
+		Keypad_keyoff(&vm->keypad);
     }
 }
 
 void SKNPVx(vm_t *vm) {
-	keypad_t *key = Keypad_get(vm->keypad, vm->registers.Vx[vm->instructions.x]);
-    if (key != NULL && !key->state) {
+	if (!Keypad_check(&vm->keypad, vm->registers.Vx[vm->instructions.x])) {
         vm->registers.PC += 2;
-    }
+	}
 }
 
 void LDVxDT(vm_t *vm) {
@@ -323,9 +320,10 @@ void LDVxK(vm_t *vm) {
         if ((key = getch()) == ERR)
             continue;
 
-        int8_t value = Keypad_value(vm->keypad, key);
+        int8_t value = Keypad_value(&vm->keypad, key);
         if (value != -1) {
             vm->registers.Vx[vm->instructions.x] = value;
+
             return;
         }
     }

@@ -1,49 +1,37 @@
 #include <memory.h>
 #include "keypad.h"
 
-void Keypad_init(keypad_t keypad[KEYPAD_SIZE], const char *map) {
-	memset(keypad, 0, sizeof(keypad_t)*KEYPAD_SIZE);
+void Keypad_init(keypad_t *keypad, const char *map) {
+	memset(keypad, 0, sizeof(keypad_t));
 	int i;
 	for (i = 0; i < KEYPAD_SIZE; i++) {
-		keypad[i].key = map[i];
-		keypad[i].value = KEYPAD_STD_KEYS[i];
+		keypad->keys[i].key = map[i];
+		keypad->keys[i].value = KEYPAD_STD_KEYS[i];
 	}
 }
 
-void Keypad_keyon(keypad_t keypad[KEYPAD_SIZE], const char key) {
+void Keypad_keyon(keypad_t *keypad, const char key) {
 	int i;
 	for (i = 0; i < KEYPAD_SIZE; i++)
-		if (keypad[i].key == key) {
-			keypad[i].state = true;
+		if (keypad->keys[i].key == key) {
+			keypad->keyon = keypad->keys[i].value;
 			return;
 		}
 }
 
-void Keypad_keyoff(keypad_t keypad[KEYPAD_SIZE], const char key) {
-	int i;
-	for (i = 0; i < KEYPAD_SIZE; i++)
-		if (keypad[i].key == key) {
-			keypad[i].state = false;
-			return;
-		}
+void Keypad_keyoff(keypad_t *keypad) {
+	keypad->keyon = 0;
 }
 
-keypad_t *Keypad_get(keypad_t keypad[KEYPAD_SIZE], const uint8_t value) {
-	int i;
-	for (i = 0; i < KEYPAD_SIZE; i++) {
-		if (keypad[i].value == value) {
-			return &keypad[i];
-		}
-	}
-
-	return NULL;
+bool Keypad_check(keypad_t *keypad, const uint8_t value) {
+	return keypad->keyon == value;
 }
 
-int8_t Keypad_value(keypad_t keypad[KEYPAD_SIZE], const char key) {
+int8_t Keypad_value(keypad_t *keypad, const char key) {
 	int i;
 	for (i = 0; i < KEYPAD_SIZE; i++) {
-		if (keypad[i].key == key) {
-			return keypad[i].value;
+		if (keypad->keys[i].key == key) {
+			return keypad->keys[i].value;
 		}
 	}
 

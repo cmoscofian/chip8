@@ -12,7 +12,7 @@ struct instructions {
 };
 typedef struct instructions instructions_t;
 
-void Instructions_set(instructions_t *, const uint16_t);
 void Instructions_init(instructions_t *);
+void Instructions_set(instructions_t *, const uint16_t);
 
 #endif

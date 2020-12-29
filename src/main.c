@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "debugger.h"
 #include "vm.h"
 
 static void splash_screen(uint16_t y, uint16_t x) {
-	WINDOW *window = newwin(DISPLAY_HEIGHT, DISPLAY_WIDTH, y, x);
+	WINDOW *window = newwin(DISPLAY_HEIGHT, DISPLAY_WIDTH*2, y, x);
 	if (window == NULL) {
 		printf("Unable to generate a new window");
 		exit(1);
@@ -36,16 +37,14 @@ int main(const int argc, const char **argv) {
 	noecho();
 	nodelay(stdscr, 1);
 
-	int yMax, xMax;
-	getmaxyx(stdscr, yMax, xMax);
-
-	uint16_t y = yMax / 2 - DISPLAY_HEIGHT / 2;
-	uint16_t x = xMax / 2 - DISPLAY_WIDTH / 2;
-
-	splash_screen(y, x);
+	splash_screen(0, 0);
+	wclear(stdscr);
 
 	vm_t vm;
-	VM_init(&vm, argv[1], false, y, x);
+	VM_init(&vm, argv[1], false, 0, 0);
+
+	debugger_t db;
+	Debugger_init(&db, &vm);
 
 	while (1) {
 		int c;
@@ -53,10 +52,11 @@ int main(const int argc, const char **argv) {
 			switch (c) {
 			case 27:
 				Display_cleanup(&vm.display);
+				Debugger_cleanup(&db);
 				endwin();
 				return 0;
 			default:
-				Keypad_keyon(vm.keypad, c);
+				Keypad_keyon(&vm.keypad, c);
 				break;
 			}
 		}
@@ -76,6 +76,7 @@ int main(const int argc, const char **argv) {
 			Display_draw(&vm.display);
 		}
 
+		Debugger_draw(&db);
 		usleep(2000);
 	}
 

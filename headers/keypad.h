@@ -20,17 +20,22 @@ static const uint8_t KEYPAD_STD_KEYS[KEYPAD_SIZE] = {
 	0xa, 0x0, 0xb, 0xf,
 };
 
-struct keypad {
+struct key {
 	char key;
 	uint8_t value;
-	bool state;
+};
+typedef struct key key_t;
+
+struct keypad {
+	key_t keys[KEYPAD_SIZE];
+	int8_t keyon;
 };
 typedef struct keypad keypad_t;
 
-void Keypad_init(keypad_t keypad[KEYPAD_SIZE], const char *);
-void Keypad_keyon(keypad_t keypad[KEYPAD_SIZE], const char);
-void Keypad_keyoff(keypad_t keypad[KEYPAD_SIZE], const char);
-keypad_t *Keypad_get(keypad_t keypad[KEYPAD_SIZE], const uint8_t);
-int8_t Keypad_value(keypad_t keypad[KEYPAD_SIZE], const char);
+void Keypad_init(keypad_t *, const char *);
+void Keypad_keyon(keypad_t *, const char);
+void Keypad_keyoff(keypad_t *);
+bool Keypad_check(keypad_t *, const uint8_t);
+int8_t Keypad_value(keypad_t *, const char);
 
 #endif
